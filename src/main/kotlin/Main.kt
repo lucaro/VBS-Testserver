@@ -26,6 +26,27 @@ object Main {
             staticFiles.externalLocation(staticFilesLocation.absolutePath)
         }
 
+        http.options("/*") {
+
+            val accessControlRequestHeaders = request
+                    .headers("Access-Control-Request-Headers")
+            if (accessControlRequestHeaders != null) {
+                response.header("Access-Control-Allow-Headers",
+                        accessControlRequestHeaders)
+            }
+
+            val accessControlRequestMethod = request
+                    .headers("Access-Control-Request-Method")
+            if (accessControlRequestMethod != null) {
+                response.header("Access-Control-Allow-Methods",
+                        accessControlRequestMethod)
+            }
+
+            "OK"
+        }
+
+        http.before { response.header("Access-Control-Allow-Origin", "*") }
+
         http.get("/submit") {
             val team = if (this.request.queryParams().contains("team")) {
                 this.request.queryParams("team").toIntOrNull()
