@@ -47,7 +47,7 @@ object Main {
 
         http.before { response.header("Access-Control-Allow-Origin", "*") }
 
-        http.get("/submit") {
+        val submit: spark.kotlin.RouteHandler.() -> Any = submit@ {
             val team = if (this.request.queryParams().contains("team")) {
                 this.request.queryParams("team").toIntOrNull()
             } else {
@@ -97,8 +97,12 @@ object Main {
                 returnString += " Please also include your sequence of actions for a detailed analysis!"
             }
 
-            return@get returnString
+            return@submit returnString
         }
+
+
+        http.get("/submit", function = submit)
+        http.post("/submit", function = submit)
 
         http.get("/video") {
             return@get File(baseLocation, currentSegment.name).inputStream().copyTo(response.raw().outputStream)
